@@ -45,7 +45,7 @@ func GenerateRunwayVideo(imageURL string, prompt string, duration int) (string, 
 
 	req, err := http.NewRequest(
 		"POST",
-		"https://api.runwayml.com/v1/image_to_video",
+		"https://api.dev.runwayml.com/v1/image_to_video",
 		bytes.NewBuffer(jsonBody),
 	)
 
