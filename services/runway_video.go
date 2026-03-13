@@ -11,10 +11,11 @@ import (
 )
 
 type runwayRequest struct {
-	Model    string `json:"model"`
-	Prompt   string `json:"prompt"`
-	Image    string `json:"image"`
-	Duration int    `json:"duration"`
+	Model       string `json:"model"`
+	Prompt      string `json:"prompt"`
+	PromptImage string `json:"promptImage"`
+	Ratio       string `json:"ratio"`
+	Duration    int    `json:"duration"`
 }
 
 type runwayResponse struct {
@@ -29,11 +30,17 @@ func GenerateRunwayVideo(imageURL string, prompt string, duration int) (string, 
 		return "", errors.New("runway api key not configured")
 	}
 
+	// Veo models only support 4,6,8 seconds
+	if duration != 4 && duration != 6 && duration != 8 {
+		duration = 8
+	}
+
 	reqBody := runwayRequest{
-		Model:    "veo3.1_fast",
-		Prompt:   prompt,
-		Image:    imageURL,
-		Duration: duration,
+		Model:       "veo3.1_fast",
+		Prompt:      prompt,
+		PromptImage: imageURL,
+		Ratio:       "720:1280",
+		Duration:    duration,
 	}
 
 	jsonBody, err := json.Marshal(reqBody)
