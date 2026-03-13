@@ -12,6 +12,7 @@ func GenerateVideo(c *gin.Context) {
 	var input struct {
 		ImageURL string `json:"image_url"`
 		Prompt   string `json:"prompt"`
+		Duration int    `json:"duration"`
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -21,7 +22,23 @@ func GenerateVideo(c *gin.Context) {
 		return
 	}
 
-	videoURL, err := services.GenerateRunwayVideo(input.ImageURL, input.Prompt)
+	if input.ImageURL == "" || input.Prompt == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "image_url and prompt are required",
+		})
+		return
+	}
+
+	// default duration if not provided
+	if input.Duration == 0 {
+		input.Duration = 5
+	}
+
+	videoID, err := services.GenerateRunwayVideo(
+		input.ImageURL,
+		input.Prompt,
+		input.Duration,
+	)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -31,6 +48,6 @@ func GenerateVideo(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"video_url": videoURL,
+		"video_id": videoID,
 	})
 }

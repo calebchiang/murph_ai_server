@@ -9,16 +9,17 @@ import (
 )
 
 type runwayRequest struct {
-	Prompt string `json:"prompt"`
-	Image  string `json:"image"`
-	Model  string `json:"model"`
+	Prompt   string `json:"prompt"`
+	Image    string `json:"image"`
+	Model    string `json:"model"`
+	Duration int    `json:"duration"`
 }
 
 type runwayResponse struct {
 	ID string `json:"id"`
 }
 
-func GenerateRunwayVideo(imageURL string, prompt string) (string, error) {
+func GenerateRunwayVideo(imageURL string, prompt string, duration int) (string, error) {
 
 	apiKey := os.Getenv("RUNWAY_API_KEY")
 
@@ -27,12 +28,16 @@ func GenerateRunwayVideo(imageURL string, prompt string) (string, error) {
 	}
 
 	reqBody := runwayRequest{
-		Prompt: prompt,
-		Image:  imageURL,
-		Model:  "gen4_turbo",
+		Prompt:   prompt,
+		Image:    imageURL,
+		Model:    "gen4_turbo",
+		Duration: duration,
 	}
 
-	jsonBody, _ := json.Marshal(reqBody)
+	jsonBody, err := json.Marshal(reqBody)
+	if err != nil {
+		return "", err
+	}
 
 	req, err := http.NewRequest(
 		"POST",
@@ -50,7 +55,6 @@ func GenerateRunwayVideo(imageURL string, prompt string) (string, error) {
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
-
 	if err != nil {
 		return "", err
 	}
@@ -60,7 +64,6 @@ func GenerateRunwayVideo(imageURL string, prompt string) (string, error) {
 	var result runwayResponse
 
 	err = json.NewDecoder(resp.Body).Decode(&result)
-
 	if err != nil {
 		return "", err
 	}
