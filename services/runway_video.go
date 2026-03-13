@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
 	"net/http"
 	"os"
 )
@@ -39,6 +41,8 @@ func GenerateRunwayVideo(imageURL string, prompt string, duration int) (string, 
 		return "", err
 	}
 
+	fmt.Println("Runway request payload:", string(jsonBody))
+
 	req, err := http.NewRequest(
 		"POST",
 		"https://api.runwayml.com/v1/image_to_video",
@@ -61,11 +65,27 @@ func GenerateRunwayVideo(imageURL string, prompt string, duration int) (string, 
 
 	defer resp.Body.Close()
 
-	var result runwayResponse
-
-	err = json.NewDecoder(resp.Body).Decode(&result)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
+	}
+
+	fmt.Println("Runway status:", resp.StatusCode)
+	fmt.Println("Runway response:", string(bodyBytes))
+
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+		return "", errors.New("runway request failed")
+	}
+
+	var result runwayResponse
+
+	err = json.Unmarshal(bodyBytes, &result)
+	if err != nil {
+		return "", err
+	}
+
+	if result.ID == "" {
+		return "", errors.New("runway returned empty job id")
 	}
 
 	return result.ID, nil
