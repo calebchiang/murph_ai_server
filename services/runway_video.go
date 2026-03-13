@@ -55,6 +55,7 @@ func GenerateRunwayVideo(imageURL string, prompt string, duration int) (string, 
 
 	req.Header.Set("Authorization", "Bearer "+apiKey)
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Runway-Version", "2024-11-06")
 
 	client := &http.Client{}
 
