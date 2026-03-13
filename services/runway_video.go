@@ -11,10 +11,11 @@ import (
 )
 
 type runwayRequest struct {
-	Prompt   string `json:"prompt"`
-	Image    string `json:"image"`
-	Model    string `json:"model"`
-	Duration int    `json:"duration"`
+	Model       string `json:"model"`
+	Prompt      string `json:"prompt"`
+	PromptImage string `json:"promptImage"`
+	Ratio       string `json:"ratio"`
+	Duration    int    `json:"duration"`
 }
 
 type runwayResponse struct {
@@ -30,10 +31,11 @@ func GenerateRunwayVideo(imageURL string, prompt string, duration int) (string, 
 	}
 
 	reqBody := runwayRequest{
-		Prompt:   prompt,
-		Image:    imageURL,
-		Model:    "gen4_turbo",
-		Duration: duration,
+		Model:       "gen4_turbo",
+		Prompt:      prompt,
+		PromptImage: imageURL,
+		Ratio:       "720:1280",
+		Duration:    duration,
 	}
 
 	jsonBody, err := json.Marshal(reqBody)
