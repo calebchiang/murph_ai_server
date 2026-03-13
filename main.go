@@ -18,6 +18,7 @@ func main() {
 
 	r := gin.Default()
 	routes.UserRoutes(r)
+	routes.VideoRoutes(r)
 
 	r.Run()
 }
